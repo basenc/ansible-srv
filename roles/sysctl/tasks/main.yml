@@ -1,0 +1,10 @@
+---
+- name: Enable ipv4 forwarding
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/20-ipforward.conf
+    content: 'net.ipv4.ip_forward = 1'
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  tags:
+    - config

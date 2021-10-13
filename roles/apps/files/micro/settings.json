@@ -1,0 +1,14 @@
+{
+  "autoclose": false,
+  "autosu": true,
+  "colorcolumn": 80,
+  "hlsearch": true,
+  "mkparents": true,
+  "permbackup": true,
+  "rmtrailingws": true,
+  "saveundo": true,
+  "tabmovement": true,
+  "tabsize": 2,
+  "tabstospaces": true,
+  "xterm": true
+}

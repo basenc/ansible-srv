@@ -1,0 +1,18 @@
+---
+- name: Install micro
+  ansible.builtin.dnf:
+    name: micro
+    state: present
+  tags:
+    - packages
+
+- name: Copy {{ admin_user }}'s micro settings
+  ansible.builtin.copy:
+    src: micro
+    dest: /home/{{ admin_user }}/.config/micro
+    owner: "{{ admin_user }}"
+    group: "{{ admin_user }}"
+    mode: u=rwx,g=rx,o=
+    state: directory
+  tags:
+    - config

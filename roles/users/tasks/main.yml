@@ -1,0 +1,59 @@
+---
+- name: Disable root user password
+  ansible.builtin.user:
+    name: root
+    password: '!'
+    # shell: /bin/false
+
+- name: Make sure we have a 'wheel' group
+  ansible.builtin.group:
+    name: wheel
+    state: present
+
+- name: Allow 'wheel' group to use sudo
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) ALL'
+    validate: 'visudo -cf %s'
+    state: present
+  tags:
+    - config
+
+- name: Enable password feedback to make system more vulnerable
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    regex: "^Defaults"
+    line: "Defaults env_reset,pwfeedback"
+    validate: 'visudo -cf %s'
+    state: present
+  tags:
+    - config
+
+- name: Create administrator
+  ansible.builtin.user:
+    name: "{{ admin_user }}"
+    groups:
+      - wheel
+      - adm
+      - systemd-journal
+    password: "{{ admin_user_hashed_password }}"
+    state: present
+
+- name: Ensure /home/{{ admin_user }}/.ssh dir exists
+  ansible.builtin.file:
+    path: /home/{{ admin_user }}/.ssh
+    state: directory
+    owner: "{{ admin_user }}"
+    group: "{{ admin_user }}"
+    mode: u=rwx,g=rx,o=
+
+- name: Copy ssh keys
+  ansible.builtin.copy:
+    dest: /home/{{ admin_user }}/.ssh/authorized_keys
+    content: "{{ ssh_key }}"
+    owner: "{{ admin_user }}"
+    group: "{{ admin_user }}"
+    mode: u=rw,g=r,o=
+  tags:
+    - config

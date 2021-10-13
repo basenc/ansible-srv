@@ -1,0 +1,22 @@
+---
+# - name: Install zram-generator
+#   ansible.builtin.dnf:
+#     name: zram-generator-defaults
+#     state: present
+#   tags:
+#     - packages
+
+- name: Enable zram
+  block:
+  - ansible.builtin.copy:
+      dest: /etc/systemd/zram-generator.conf
+      content: '[zram0]'
+      owner: root
+      group: root
+      mode: u=r,g=r,o=
+    tags:
+      - config
+
+  - ansible.builtin.systemd:
+      name: /dev/zram0
+      state: started

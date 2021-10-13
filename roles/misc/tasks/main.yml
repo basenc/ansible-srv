@@ -1,0 +1,9 @@
+---
+- name: Set timezone
+  ansible.builtin.file:
+    src: /usr/share/zoneinfo/Europe/Moscow
+    dest: /etc/localtime
+    state: link
+    force: yes
+  tags:
+    - config

@@ -1,0 +1,15 @@
+---
+- hosts: webservers
+  become: yes
+
+  roles:
+    - users
+    - ssh
+
+  post_tasks:
+    - name: reboot
+      ansible.builtin.reboot:
+
+
+  collections:
+    - community.general

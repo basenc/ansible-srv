@@ -1,0 +1,40 @@
+---
+- name: Enable EPEL repository
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - epel-release
+    - dnf-automatic
+  tags:
+    - packages
+
+- name: Setup dnf-automatic
+  block:
+  - name: Install dnf-automatic
+    ansible.builtin.dnf:
+      name: dnf-automatic
+      state: present
+    tags:
+      - packages
+
+  - name: Edit dnf-automatic config
+    ansible.builtin.copy:
+      dest: /etc/dnf/automatic.conf
+      content: |
+        [commands]
+        apply_updates=yes
+        [emitters]
+        emit_via=motd
+      owner: root
+      group: root
+      mode: u=rw,g=r,o=r
+    tags:
+      - config
+
+  - name: Enable dnf-automatic unit
+    ansible.builtin.systemd:
+      name: dnf-automatic.timer
+      enabled: yes
+    tags:
+      - systemd

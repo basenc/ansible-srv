@@ -1,0 +1,10 @@
+set fish_greeting ''
+cat /etc/motd
+export EDITOR=micro
+export PATH="$PATH:/home/{{ admin_user }}/.local/bin"
+export DOCKER_HOST=/run/user/{{ podman_user }}/podman/podman.sock
+abbr -a -g dcu docker-compose up
+abbr -a -g dcud docker-compose up -d
+abbr -a -g dcr docker-compose down && docker-compose up
+abbr -a -g dcrd docker-compose down && docker-compose up -d
+abbr -a -g sysprune dokcer system prune --all --volumes

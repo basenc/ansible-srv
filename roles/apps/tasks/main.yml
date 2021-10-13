@@ -1,0 +1,9 @@
+---
+- name: Install and setup fish shell
+  import_tasks: fish.yml
+
+- name: Install and setup micro text editor
+  import_tasks: micro.yml
+
+- name: Install and setup docker-compose
+  import_tasks: docker-compose.yml

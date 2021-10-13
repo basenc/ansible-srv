@@ -1,0 +1,7 @@
+---
+- name: Disable default user
+  ansible.builtin.user:
+    name: alwyzon
+    password: '!'
+    shell: /bin/false
+    state: absent

@@ -1,0 +1,50 @@
+---
+- name: Install podman
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - podman
+    - podman-compose
+    - podman-docker
+  tags:
+    - packages
+
+- name: Allow podman to use privileged ports
+  block:
+  - ansible.builtin.shell: which slirp4netns
+    register: slirp4netns_path
+
+  - community.general.capabilities:
+      path: "{{ slirp4netns_path.stdout }}"
+      capability: cap_net_bind_service=+ep
+      state: present
+
+- name: Enable podman socket
+  ansible.builtin.systemd:
+    name: podman.socket
+    enabled: true
+    scope: user
+  become: yes
+  become_user: "{{ podman_user }}"
+  tags:
+    - systemd
+
+- name: Check if {{ podman_user }} lingers
+  ansible.builtin.stat:
+    path: /var/lib/systemd/linger/{{ podman_user }}
+  register: linger
+
+- name: Enable linger for {{ podman_user }}
+  ansible.builtin.shell: loginctl enable-linger {{ podman_user }}
+  when: not linger.stat.exists
+  tags:
+    - podman
+
+- name: Install docker-compose
+  ansible.builtin.pip:
+    name: docker-compose
+    state: present
+    extra_args: --user
+  become: yes
+  become_user: "{{ admin_user }}"

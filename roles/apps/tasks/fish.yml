@@ -1,0 +1,43 @@
+---
+- name: Install fish shell
+  ansible.builtin.dnf:
+    name: fish
+    state: present
+  tags:
+    - packages
+
+- name: Ensure fish config dir exists for {{ admin_user }}
+  ansible.builtin.file:
+    path: /home/{{ admin_user }}/.config/fish
+    owner: "{{ admin_user }}"
+    group: "{{ admin_user }}"
+    mode: u=rwx,g=rx,o=
+    force: no
+    state: directory
+
+- name: Copy {{ admin_user }}'s fish settings
+  ansible.builtin.template:
+    src: config.fish.j2
+    dest: /home/{{ admin_user }}/.config/config.fish
+    owner: "{{ admin_user }}"
+    group: "{{ admin_user }}"
+    mode: u=rw,g=r,o=
+  tags:
+    - config
+
+- name: Set default shell for {{ admin_user }} (compatibility)
+  block:
+  - ansible.builtin.copy:
+      dest: /home/{{ admin_user }}/.bash_profile
+      content: "fish; exit 0"
+      owner: "{{ admin_user }}"
+      group: "{{ admin_user }}"
+      mode: u=rw,g=r,o=
+  - ansible.builtin.copy:
+      dest: /home/{{ admin_user }}/.bashrc
+      content: "fish; exit 0"
+      owner: "{{ admin_user }}"
+      group: "{{ admin_user }}"
+      mode: u=rw,g=r,o=
+  tags:
+    - config

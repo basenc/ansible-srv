@@ -1,0 +1,17 @@
+---
+- hosts: webservers
+  become: yes
+
+  roles:
+    - post-install
+    - dnf
+    - sysctl
+    - apps
+    - misc
+
+  post_tasks:
+    - name: reboot
+      ansible.builtin.reboot:
+
+  collections:
+    - community.general
